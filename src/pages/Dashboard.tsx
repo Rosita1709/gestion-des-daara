@@ -1,9 +1,11 @@
+import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 import { Layout } from '@/components/layout/Layout';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { RecentActivity } from '@/components/dashboard/RecentActivity';
 import { QuickActions } from '@/components/dashboard/QuickActions';
 import { PerformanceChart } from '@/components/dashboard/PerformanceChart';
-import { Building2, Users, BookOpen, ScrollText } from 'lucide-react';
+import { Building2, Users, BookOpen, ScrollText, Moon, Sun } from 'lucide-react';
 import {
   mockEstablishments,
   mockTutors,
@@ -13,6 +15,17 @@ import {
 } from '@/data/mockData';
 
 const Dashboard = () => {
+  const [mounted, setMounted] = useState(false);
+  const { resolvedTheme, setTheme } = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  const toggleTheme = () => {
+    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
+  };
+
   const stats = [
     {
       title: 'Daaras',
@@ -59,8 +72,7 @@ const Dashboard = () => {
               Bienvenue, Administrateur. Aperçu global de la gestion des Daaras.
             </p>
           </div>
-          <div className="text-right">
-            <p className="text-sm text-muted-foreground">Dernière mise à jour</p>
+          <div className="flex items-center gap-3">
             <p className="text-sm font-medium text-foreground">
               {new Date().toLocaleDateString('fr-FR', {
                 weekday: 'long',
@@ -69,6 +81,18 @@ const Dashboard = () => {
                 day: 'numeric'
               })}
             </p>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-2 rounded-lg border border-border bg-card hover:bg-muted/50 transition-colors text-muted-foreground hover:text-foreground"
+              aria-label={resolvedTheme === 'dark' ? 'Mode clair' : 'Mode sombre'}
+            >
+              {mounted && resolvedTheme === 'dark' ? (
+                <Sun className="w-4 h-4" />
+              ) : (
+                <Moon className="w-4 h-4" />
+              )}
+            </button>
           </div>
         </div>
       </div>

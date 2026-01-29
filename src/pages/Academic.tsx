@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Button } from '@/components/ui/button';
 import { mockAcademicItems, mockEstablishments, mockTutors } from '@/data/mockData';
-import { Edit, Trash2 } from 'lucide-react';
+import { Edit, Trash2, BookOpen } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Academic = () => {
@@ -17,8 +17,12 @@ const Academic = () => {
     <Layout>
       <div className="page-header flex flex-col md:flex-row md:items-center justify-between mb-6">
         <h1 className="page-title text-2xl font-bold">Contenus Madrasa</h1>
-        <Button onClick={() => navigate('/academic/new')} className="mt-2 md:mt-0">
-          Ajouter un contenu
+        <Button
+          onClick={() => navigate('/academic/new')}
+          className="mt-2 md:mt-0 bg-warning text-warning-foreground hover:bg-warning/90 transition-colors duration-300"
+        >
+          <BookOpen className="w-4 h-4 mr-2" />
+          Nouveau contenu
         </Button>
       </div>
 

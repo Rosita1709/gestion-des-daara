@@ -31,10 +31,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Tutor, Establishment } from '@/types';
+import { mockEstablishments } from '@/data/mockData';
 import { cn } from '@/lib/utils';
 
-
 const generateMockTutors = (establishments: Establishment[]): Tutor[] => {
+  if (!establishments?.length) return [];
   const firstNames = ['Awa', 'Mamadou', 'Fatou', 'Ousmane', 'Mariama', 'Cheikh'];
   const lastNames = ['Diallo', 'Sarr', 'Ba', 'Diop', 'Ngom', 'Lo'];
   const specializations = ['Mathématiques', 'Physique', 'Chimie', 'Informatique', 'Français', 'Histoire'];
@@ -70,9 +71,9 @@ const generateMockTutors = (establishments: Establishment[]): Tutor[] => {
   return tutors;
 };
 
-const Tutors = ({ establishments }: { establishments: Establishment[] }) => {
+const Tutors = () => {
   const navigate = useNavigate();
-  const [tutors, setTutors] = useState<Tutor[]>(generateMockTutors(establishments));
+  const [tutors, setTutors] = useState<Tutor[]>(() => generateMockTutors(mockEstablishments));
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null);
@@ -120,7 +121,7 @@ const Tutors = ({ establishments }: { establishments: Establishment[] }) => {
           </div>
           <Button 
             onClick={() => navigate('/tutors/new')}
-            className="btn-gradient"
+            className="bg-secondary text-secondary-foreground hover:bg-secondary/90 transition-colors duration-300"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nouveau tuteur

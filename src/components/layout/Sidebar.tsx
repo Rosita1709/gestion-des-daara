@@ -14,7 +14,7 @@ import {
 import { cn } from '@/lib/utils';
 
 const navigation = [
-  { name: 'Tableau de bord', href: '/', icon: LayoutDashboard },
+  { name: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
   { name: 'Établissements', href: '/establishments', icon: Building2 },
   { name: 'Tuteurs', href: '/tutors', icon: Users },
   { name: 'Apprenants', href: '/students', icon: GraduationCap },
@@ -103,11 +103,9 @@ export function Sidebar() {
               <p className="text-xs text-sidebar-muted truncate">admin@daaradji.com</p>
             </div>
           )}
-          {!collapsed && (
-            <button className="p-2 rounded-lg hover:bg-sidebar-accent transition-colors">
-              <LogOut className="w-4 h-4 text-sidebar-muted" />
-            </button>
-          )}
+          <button className="p-2 rounded-lg hover:bg-sidebar-accent transition-colors">
+            <LogOut className="w-4 h-4 text-sidebar-muted" />
+          </button>
         </div>
       </div>
     </aside>

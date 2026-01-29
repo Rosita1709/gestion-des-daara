@@ -117,7 +117,7 @@ const Students = () => {
           </div>
           <Button 
             onClick={() => navigate('/students/new')}
-            className="btn-gradient"
+            className="bg-accent text-accent-foreground hover:bg-accent/90 transition-colors duration-300"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nouveau talibé
@@ -248,7 +248,10 @@ const Students = () => {
               : 'Commencez par inscrire votre premier talibé'}
           </p>
           {!searchQuery && (
-            <Button onClick={() => navigate('/students/new')} className="mt-4 btn-gradient">
+            <Button
+              onClick={() => navigate('/students/new')}
+              className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90 transition-colors duration-300"
+            >
               <Plus className="w-4 h-4 mr-2" />
               Inscrire un talibé
             </Button>

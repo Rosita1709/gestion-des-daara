@@ -89,7 +89,7 @@ const Establishments = () => {
           </div>
           <Button
             onClick={() => navigate('/establishments/new')}
-            className="btn-gradient"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 transition-colors duration-300"
           >
             <Plus className="w-4 h-4 mr-2" />
             Nouveau Daara
