@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { Users, ArrowLeft, Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+
 import {
   Select,
   SelectContent,
@@ -16,11 +17,22 @@ import { Switch } from '@/components/ui/switch';
 import { mockTutors, mockEstablishments } from '@/data/mockData';
 import { toast } from 'sonner';
 
+// Fonction pour générer l'email automatiquement selon le daara
+const generateEmail = (firstName: string, lastName: string, daaraName: string) => {
+  const normalize = (str: string) =>
+    str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // supprimer accents
+      .replace(/\s+/g, '') // supprimer espaces
+      .replace(/[^a-z0-9]/gi, ''); // lettres et chiffres uniquement
+  return `${normalize(firstName)}.${normalize(lastName)}@${normalize(daaraName)}.fr`.toLowerCase();
+};
+
 const TutorForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
-  
+
   const existingTutor = id 
     ? mockTutors.find((t) => t.id === id) 
     : null;
@@ -34,6 +46,17 @@ const TutorForm = () => {
     establishmentId: existingTutor?.establishmentId || '',
     status: existingTutor?.status === 'active',
   });
+
+  // Met à jour automatiquement l'email lorsque prénom, nom ou établissement changent
+  useEffect(() => {
+    if (!isEdit && formData.firstName && formData.lastName && formData.establishmentId) {
+      const daara = mockEstablishments.find(e => e.id === formData.establishmentId)?.name || '';
+      setFormData(prev => ({
+        ...prev,
+        email: generateEmail(prev.firstName, prev.lastName, daara)
+      }));
+    }
+  }, [formData.firstName, formData.lastName, formData.establishmentId, isEdit]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -106,9 +129,8 @@ const TutorForm = () => {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="marie.dubois@exemple.fr"
-                  className="mt-1.5"
+                  readOnly
+                  className="mt-1.5 bg-muted/10 cursor-not-allowed"
                 />
               </div>
               <div>
@@ -117,7 +139,7 @@ const TutorForm = () => {
                   id="phone"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+33 6 12 34 56 78"
+                  placeholder="+221 77 123 45 67"
                   className="mt-1.5"
                 />
               </div>

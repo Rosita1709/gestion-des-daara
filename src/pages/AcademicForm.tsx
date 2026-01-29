@@ -16,35 +16,45 @@ import {
 import { mockAcademicItems, mockEstablishments, mockTutors } from '@/data/mockData';
 import { toast } from 'sonner';
 
+//  Types 
+type AcademicType = 'course' | 'tajwid' | 'fiqh' | 'khatm';
+type StatusType = 'draft' | 'published' | 'completed';
+
 const AcademicForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
-  
+
   const existingItem = id 
     ? mockAcademicItems.find((i) => i.id === id) 
     : null;
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    type: AcademicType;
+    description: string;
+    dueDate: string;
+    establishmentId: string;
+    tutorId: string;
+    status: StatusType;
+  }>({
     title: existingItem?.title || '',
-    type: existingItem?.type || 'course',
+    type: (existingItem?.type as AcademicType) || 'course',
     description: existingItem?.description || '',
-    dueDate: existingItem?.dueDate 
-      ? new Date(existingItem.dueDate).toISOString().split('T')[0] 
+    dueDate: existingItem?.dueDate
+      ? new Date(existingItem.dueDate).toISOString().split('T')[0]
       : '',
     establishmentId: existingItem?.establishmentId || '',
     tutorId: existingItem?.tutorId || '',
-    status: existingItem?.status || 'draft',
+    status: (existingItem?.status as StatusType) || 'draft',
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!formData.title || !formData.establishmentId || !formData.tutorId) {
       toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
-
     toast.success(
       isEdit 
         ? 'Contenu modifié avec succès' 
@@ -53,7 +63,6 @@ const AcademicForm = () => {
     navigate('/academic');
   };
 
-  // Filter tutors by selected establishment
   const availableTutors = mockTutors.filter(
     (t) => t.establishmentId === formData.establishmentId && t.status === 'active'
   );
@@ -71,18 +80,19 @@ const AcademicForm = () => {
         </button>
         <h1 className="page-title flex items-center gap-3">
           <BookOpen className="w-8 h-8 text-warning" />
-          {isEdit ? 'Modifier le contenu' : 'Nouveau contenu académique'}
+          {isEdit ? 'Modifier le contenu' : 'Nouveau contenu Madrasa'}
         </h1>
         <p className="page-subtitle">
           {isEdit 
-            ? 'Modifiez les informations du contenu' 
-            : 'Créez un nouveau cours, devoir, examen ou TP'}
+            ? 'Modifiez les informations du contenu'
+            : 'Créez un nouveau contenu : Sourate, Tajwid, Fiqh ou Phase finale'}
         </p>
       </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="max-w-2xl">
         <div className="bg-card rounded-xl border border-border/50 shadow-sm overflow-hidden">
+
           {/* Basic Info */}
           <div className="p-6 border-b border-border/50">
             <h3 className="text-lg font-semibold text-foreground mb-4">Informations générales</h3>
@@ -93,32 +103,34 @@ const AcademicForm = () => {
                   id="title"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  placeholder="Ex: Introduction aux Algorithmes"
+                  placeholder="Ex: Sourate Al-Fatiha"
                   className="mt-1.5"
                 />
               </div>
+
               <div>
                 <Label htmlFor="type">Type de contenu *</Label>
                 <Select
                   value={formData.type}
-                  onValueChange={(value) => setFormData({ ...formData, type: value as any })}
+                  onValueChange={(value) => setFormData({ ...formData, type: value as AcademicType })}
                 >
                   <SelectTrigger className="mt-1.5">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border border-border">
-                    <SelectItem value="course">Cours</SelectItem>
-                    <SelectItem value="homework">Devoir</SelectItem>
-                    <SelectItem value="exam">Examen</SelectItem>
-                    <SelectItem value="tp">Travaux Pratiques (TP)</SelectItem>
+                    <SelectItem value="course">Sourate</SelectItem>
+                    <SelectItem value="tajwid">Tajwid</SelectItem>
+                    <SelectItem value="fiqh">Fiqh</SelectItem>
+                    <SelectItem value="khatm">Phase finale</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <Label htmlFor="status">Statut</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value as any })}
+                  onValueChange={(value) => setFormData({ ...formData, status: value as StatusType })}
                 >
                   <SelectTrigger className="mt-1.5">
                     <SelectValue />
@@ -130,6 +142,7 @@ const AcademicForm = () => {
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="md:col-span-2">
                 <Label htmlFor="description">Description</Label>
                 <Textarea
@@ -140,7 +153,9 @@ const AcademicForm = () => {
                   className="mt-1.5 min-h-[100px]"
                 />
               </div>
-              {(formData.type === 'homework' || formData.type === 'exam' || formData.type === 'tp') && (
+
+              {/* Date limite  pour Tajwid, Fiqh et Phase finale */}
+              {(formData.type === 'tajwid' || formData.type === 'fiqh' || formData.type === 'khatm') && (
                 <div>
                   <Label htmlFor="dueDate">Date limite</Label>
                   <Input
@@ -181,6 +196,7 @@ const AcademicForm = () => {
                   </SelectContent>
                 </Select>
               </div>
+
               <div>
                 <Label htmlFor="tutor">Tuteur responsable *</Label>
                 <Select

@@ -31,15 +31,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { mockStudents } from '@/data/mockData';
+import { mockStudents, mockEstablishments } from '@/data/mockData';
 import { Student } from '@/types';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
 
+// Mapping des statuts pour les talib..
 const statusLabels = {
-  enrolled: 'Inscrit',
-  graduated: 'Diplômé',
+  enrolled: 'En cours d’apprentissage',
+  graduated: 'A terminé le Coran (Khatm)',
   suspended: 'Suspendu',
 };
 
@@ -49,6 +50,17 @@ const statusColors = {
   suspended: 'bg-destructive/10 text-destructive',
 };
 
+// Générer email automatique selon prénom.nom@nomdudara
+const generateEmail = (firstName: string, lastName: string, daaraName: string) => {
+  const normalize = (str: string) =>
+    str
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // supprimer accents
+      .replace(/\s+/g, '') // supprimer espaces
+      .replace(/[^a-z0-9]/gi, ''); // lettres et chiffres uniquement
+  return `${normalize(firstName)}.${normalize(lastName)}@${normalize(daaraName)}`;
+};
+
 const Students = () => {
   const navigate = useNavigate();
   const [students, setStudents] = useState<Student[]>(mockStudents);
@@ -56,7 +68,13 @@ const Students = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
 
-  const filteredStudents = students.filter(
+  // Mettre à jour les emails pour tous les étudiants au chargement
+  const studentsWithEmails = students.map((s) => ({
+    ...s,
+    email: generateEmail(s.firstName, s.lastName, s.establishmentName)
+  }));
+
+  const filteredStudents = studentsWithEmails.filter(
     (student) =>
       `${student.firstName} ${student.lastName}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
       student.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -81,12 +99,7 @@ const Students = () => {
   };
 
   const getAvatarColor = (id: string) => {
-    const colors = [
-      'bg-primary',
-      'bg-secondary',
-      'bg-accent',
-      'bg-warning',
-    ];
+    const colors = ['bg-primary', 'bg-secondary', 'bg-accent', 'bg-warning'];
     return colors[parseInt(id) % colors.length];
   };
 
@@ -98,16 +111,16 @@ const Students = () => {
           <div>
             <h1 className="page-title flex items-center gap-3">
               <GraduationCap className="w-8 h-8 text-accent" />
-              Gestion des apprenants
+              Gestion des talibés
             </h1>
-            <p className="page-subtitle">Gérez les étudiants inscrits sur votre plateforme</p>
+            <p className="page-subtitle">Gérez les talibés inscrits dans vos daara</p>
           </div>
           <Button 
             onClick={() => navigate('/students/new')}
             className="btn-gradient"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Nouvel apprenant
+            Nouveau talibé
           </Button>
         </div>
       </div>
@@ -117,7 +130,7 @@ const Students = () => {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Rechercher par nom, email, établissement..."
+            placeholder="Rechercher par nom, email, daara..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -192,7 +205,7 @@ const Students = () => {
               {student.tutorName && (
                 <div className="flex items-center gap-3 text-sm">
                   <Users className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Tuteur: {student.tutorName}</span>
+                  <span className="text-muted-foreground">Maître coranique: {student.tutorName}</span>
                 </div>
               )}
               <div className="flex items-center gap-3 text-sm">
@@ -228,16 +241,16 @@ const Students = () => {
       {filteredStudents.length === 0 && (
         <div className="text-center py-12">
           <GraduationCap className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground">Aucun apprenant trouvé</h3>
+          <h3 className="text-lg font-semibold text-foreground">Aucun talibé trouvé</h3>
           <p className="text-muted-foreground mt-1">
             {searchQuery
               ? 'Essayez avec d\'autres termes de recherche'
-              : 'Commencez par inscrire votre premier apprenant'}
+              : 'Commencez par inscrire votre premier talibé'}
           </p>
           {!searchQuery && (
             <Button onClick={() => navigate('/students/new')} className="mt-4 btn-gradient">
               <Plus className="w-4 h-4 mr-2" />
-              Inscrire un apprenant
+              Inscrire un talibé
             </Button>
           )}
         </div>
@@ -249,7 +262,7 @@ const Students = () => {
           <DialogHeader>
             <DialogTitle>Confirmer la suppression</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer l'apprenant "{selectedStudent?.firstName} {selectedStudent?.lastName}" ? 
+              Êtes-vous sûr de vouloir supprimer le talibé "{selectedStudent?.firstName} {selectedStudent?.lastName}" ? 
               Cette action est irréversible.
             </DialogDescription>
           </DialogHeader>

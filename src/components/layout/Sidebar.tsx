@@ -43,7 +43,7 @@ export function Sidebar() {
           </div>
           {!collapsed && (
             <div className="animate-fade-in">
-              <h1 className="text-lg font-bold text-sidebar-foreground">EduPro</h1>
+              <h1 className="text-lg font-bold text-sidebar-foreground">DAARA-DJI</h1>
               <p className="text-xs text-sidebar-muted">Super Admin</p>
             </div>
           )}
@@ -100,7 +100,7 @@ export function Sidebar() {
           {!collapsed && (
             <div className="flex-1 min-w-0 animate-fade-in">
               <p className="text-sm font-medium text-sidebar-foreground truncate">Super Admin</p>
-              <p className="text-xs text-sidebar-muted truncate">admin@edupro.com</p>
+              <p className="text-xs text-sidebar-muted truncate">admin@daaradji.com</p>
             </div>
           )}
           {!collapsed && (

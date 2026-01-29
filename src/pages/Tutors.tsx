@@ -30,13 +30,49 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { mockTutors } from '@/data/mockData';
-import { Tutor } from '@/types';
+import { Tutor, Establishment } from '@/types';
 import { cn } from '@/lib/utils';
 
-const Tutors = () => {
+
+const generateMockTutors = (establishments: Establishment[]): Tutor[] => {
+  const firstNames = ['Awa', 'Mamadou', 'Fatou', 'Ousmane', 'Mariama', 'Cheikh'];
+  const lastNames = ['Diallo', 'Sarr', 'Ba', 'Diop', 'Ngom', 'Lo'];
+  const specializations = ['Mathématiques', 'Physique', 'Chimie', 'Informatique', 'Français', 'Histoire'];
+
+  const tutors: Tutor[] = [];
+
+  for (let i = 1; i <= 12; i++) {
+    const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+    const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+    const specialization = specializations[Math.floor(Math.random() * specializations.length)];
+    const est = establishments[Math.floor(Math.random() * establishments.length)];
+    const status = Math.random() > 0.3 ? 'active' : 'inactive';
+    const studentCount = Math.floor(Math.random() * 25) + 5;
+    const phone = `+221 77 ${Math.floor(100000 + Math.random() * 900000)}`;
+    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}@${est.name.replace(/\s+/g,'').toLowerCase()}.fr`;
+    const createdAt = new Date(); 
+
+    tutors.push({
+      id: i.toString(),
+      firstName,
+      lastName,
+      specialization,
+      establishmentId: est.id,
+      establishmentName: est.name,
+      email,
+      phone,
+      status,
+      studentCount,
+      createdAt,
+    });
+  }
+
+  return tutors;
+};
+
+const Tutors = ({ establishments }: { establishments: Establishment[] }) => {
   const navigate = useNavigate();
-  const [tutors, setTutors] = useState<Tutor[]>(mockTutors);
+  const [tutors, setTutors] = useState<Tutor[]>(generateMockTutors(establishments));
   const [searchQuery, setSearchQuery] = useState('');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedTutor, setSelectedTutor] = useState<Tutor | null>(null);
@@ -66,12 +102,7 @@ const Tutors = () => {
   };
 
   const getAvatarColor = (id: string) => {
-    const colors = [
-      'bg-primary',
-      'bg-secondary',
-      'bg-accent',
-      'bg-warning',
-    ];
+    const colors = ['bg-primary', 'bg-secondary', 'bg-accent', 'bg-warning'];
     return colors[parseInt(id) % colors.length];
   };
 
@@ -102,7 +133,7 @@ const Tutors = () => {
         <div className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Rechercher par nom, spécialisation..."
+            placeholder="Rechercher par nom, spécialisation ou daara..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-10"
@@ -140,17 +171,13 @@ const Tutors = () => {
                       {getInitials(tutor.firstName, tutor.lastName)}
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">
-                        {tutor.firstName} {tutor.lastName}
-                      </p>
+                      <p className="font-medium text-foreground">{tutor.firstName} {tutor.lastName}</p>
                       <p className="text-xs text-muted-foreground">{tutor.email}</p>
                     </div>
                   </div>
                 </td>
                 <td className="py-4 px-6">
-                  <span className="px-2.5 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">
-                    {tutor.specialization}
-                  </span>
+                  <span className="px-2.5 py-1 bg-primary/10 text-primary text-xs font-medium rounded-full">{tutor.specialization}</span>
                 </td>
                 <td className="py-4 px-6">
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -177,14 +204,9 @@ const Tutors = () => {
                 <td className="py-4 px-6">
                   <span className={cn(
                     'inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full',
-                    tutor.status === 'active' 
-                      ? 'bg-success/10 text-success' 
-                      : 'bg-muted text-muted-foreground'
+                    tutor.status === 'active' ? 'bg-success/10 text-success' : 'bg-muted text-muted-foreground'
                   )}>
-                    <span className={cn(
-                      'w-1.5 h-1.5 rounded-full',
-                      tutor.status === 'active' ? 'bg-success' : 'bg-muted-foreground'
-                    )} />
+                    <span className={cn('w-1.5 h-1.5 rounded-full', tutor.status === 'active' ? 'bg-success' : 'bg-muted-foreground')} />
                     {tutor.status === 'active' ? 'Actif' : 'Inactif'}
                   </span>
                 </td>
@@ -197,19 +219,13 @@ const Tutors = () => {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-48 bg-popover border border-border shadow-lg">
                       <DropdownMenuItem onClick={() => navigate(`/tutors/${tutor.id}`)}>
-                        <Eye className="w-4 h-4 mr-2" />
-                        Voir détails
+                        <Eye className="w-4 h-4 mr-2" />Voir détails
                       </DropdownMenuItem>
                       <DropdownMenuItem onClick={() => navigate(`/tutors/${tutor.id}/edit`)}>
-                        <Edit className="w-4 h-4 mr-2" />
-                        Modifier
+                        <Edit className="w-4 h-4 mr-2" />Modifier
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={() => handleDelete(tutor)}
-                        className="text-destructive focus:text-destructive"
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" />
-                        Supprimer
+                      <DropdownMenuItem onClick={() => handleDelete(tutor)} className="text-destructive focus:text-destructive">
+                        <Trash2 className="w-4 h-4 mr-2" />Supprimer
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -219,37 +235,28 @@ const Tutors = () => {
           </tbody>
         </table>
 
-        {/* Empty State */}
         {filteredTutors.length === 0 && (
           <div className="text-center py-12">
             <Users className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-foreground">Aucun tuteur trouvé</h3>
             <p className="text-muted-foreground mt-1">
-              {searchQuery
-                ? 'Essayez avec d\'autres termes de recherche'
-                : 'Commencez par créer votre premier tuteur'}
+              {searchQuery ? 'Essayez avec d\'autres termes de recherche' : 'Commencez par créer votre premier tuteur'}
             </p>
           </div>
         )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="bg-card border border-border">
           <DialogHeader>
             <DialogTitle>Confirmer la suppression</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir supprimer le tuteur "{selectedTutor?.firstName} {selectedTutor?.lastName}" ? 
-              Cette action est irréversible.
+              Êtes-vous sûr de vouloir supprimer le tuteur "{selectedTutor?.firstName} {selectedTutor?.lastName}" ? Cette action est irréversible.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Annuler
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              Supprimer
-            </Button>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>Annuler</Button>
+            <Button variant="destructive" onClick={confirmDelete}>Supprimer</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

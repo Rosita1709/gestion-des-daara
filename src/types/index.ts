@@ -1,7 +1,7 @@
 export interface Establishment {
   id: string;
   name: string;
-  type: 'university' | 'college' | 'school' | 'institute';
+  type: 'university' | 'college' | 'school' | 'institute'|'daara' ;
   address: string;
   city: string;
   country: string;
@@ -51,7 +51,7 @@ export interface Student {
 export interface AcademicItem {
   id: string;
   title: string;
-  type: 'course' | 'homework' | 'exam' | 'tp';
+  type: 'course' | 'homework' | 'exam' | 'tp'|'sourate';
   description: string;
   dueDate?: Date;
   establishmentId: string;

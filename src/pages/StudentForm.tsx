@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
 import { GraduationCap, ArrowLeft, Save } from 'lucide-react';
@@ -15,13 +15,19 @@ import {
 import { mockStudents, mockEstablishments, mockTutors } from '@/data/mockData';
 import { toast } from 'sonner';
 
+const statusLabels = {
+  enrolled: 'Inscrit',
+  graduated: 'Diplômé',
+  suspended: 'Suspendu',
+};
+
 const StudentForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = Boolean(id);
-  
-  const existingStudent = id 
-    ? mockStudents.find((s) => s.id === id) 
+
+  const existingStudent = id
+    ? mockStudents.find((s) => s.id === id)
     : null;
 
   const [formData, setFormData] = useState({
@@ -29,8 +35,8 @@ const StudentForm = () => {
     lastName: existingStudent?.lastName || '',
     email: existingStudent?.email || '',
     phone: existingStudent?.phone || '',
-    dateOfBirth: existingStudent?.dateOfBirth 
-      ? new Date(existingStudent.dateOfBirth).toISOString().split('T')[0] 
+    dateOfBirth: existingStudent?.dateOfBirth
+      ? new Date(existingStudent.dateOfBirth).toISOString().split('T')[0]
       : '',
     address: existingStudent?.address || '',
     city: existingStudent?.city || '',
@@ -39,26 +45,53 @@ const StudentForm = () => {
     status: existingStudent?.status || 'enrolled',
   });
 
+  // Filtrer les tuteurs selon l'établissement sélectionné
+  const availableTutors = mockTutors.filter(
+    (t) => t.establishmentId === formData.establishmentId && t.status === 'active'
+  );
+
+  // Générer un email automatique en respectant les caractères valides
+  const generateEmail = (firstName: string, lastName: string, estId: string) => {
+    const est = mockEstablishments.find((e) => e.id === estId);
+    if (!est) return '';
+    
+    // Normaliser le texte: minuscules, retirer accents et espaces
+    const normalize = (str: string) => 
+      str
+        .normalize('NFD') // séparer accents
+        .replace(/[\u0300-\u036f]/g, '') // supprimer accents
+        .replace(/\s+/g, '') // supprimer espaces
+        .replace(/[^a-z0-9]/gi, ''); // garder lettres et chiffres
+    
+    const domain = normalize(est.name);
+    return `${normalize(firstName)}.${normalize(lastName)}@${domain}`;
+  };
+
+  // Mettre à jour l'email automatiquement quand prénom, nom ou établissement change
+  useEffect(() => {
+    if (formData.firstName && formData.lastName && formData.establishmentId) {
+      setFormData((prev) => ({
+        ...prev,
+        email: generateEmail(prev.firstName, prev.lastName, prev.establishmentId),
+      }));
+    }
+  }, [formData.firstName, formData.lastName, formData.establishmentId]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.establishmentId) {
+
+    if (!formData.firstName || !formData.lastName || !formData.establishmentId) {
       toast.error('Veuillez remplir tous les champs obligatoires');
       return;
     }
 
     toast.success(
-      isEdit 
-        ? 'Apprenant modifié avec succès' 
+      isEdit
+        ? 'Apprenant modifié avec succès'
         : 'Apprenant inscrit avec succès'
     );
     navigate('/students');
   };
-
-  // Filter tutors by selected establishment
-  const availableTutors = mockTutors.filter(
-    (t) => t.establishmentId === formData.establishmentId && t.status === 'active'
-  );
 
   return (
     <Layout>
@@ -76,8 +109,8 @@ const StudentForm = () => {
           {isEdit ? 'Modifier l\'apprenant' : 'Nouvel apprenant'}
         </h1>
         <p className="page-subtitle">
-          {isEdit 
-            ? 'Modifiez les informations de l\'apprenant' 
+          {isEdit
+            ? 'Modifiez les informations de l\'apprenant'
             : 'Remplissez les informations pour inscrire un nouvel apprenant'}
         </p>
       </div>
@@ -95,7 +128,7 @@ const StudentForm = () => {
                   id="firstName"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  placeholder="Ex: Lucas"
+                  placeholder="Ex: Abdou"
                   className="mt-1.5"
                 />
               </div>
@@ -105,19 +138,17 @@ const StudentForm = () => {
                   id="lastName"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  placeholder="Ex: Petit"
+                  placeholder="Ex: Diop"
                   className="mt-1.5"
                 />
               </div>
               <div>
-                <Label htmlFor="email">Email *</Label>
+                <Label htmlFor="email">Email généré</Label>
                 <Input
                   id="email"
-                  type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="lucas.petit@exemple.fr"
-                  className="mt-1.5"
+                  readOnly
+                  className="mt-1.5 bg-muted/10"
                 />
               </div>
               <div>
@@ -126,35 +157,9 @@ const StudentForm = () => {
                   id="phone"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  placeholder="+33 6 11 22 33 44"
+                  placeholder="+221 77 123 45 67"
                   className="mt-1.5"
                 />
-              </div>
-              <div>
-                <Label htmlFor="dateOfBirth">Date de naissance</Label>
-                <Input
-                  id="dateOfBirth"
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                  className="mt-1.5"
-                />
-              </div>
-              <div>
-                <Label htmlFor="status">Statut</Label>
-                <Select
-                  value={formData.status}
-                  onValueChange={(value) => setFormData({ ...formData, status: value as any })}
-                >
-                  <SelectTrigger className="mt-1.5">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-popover border border-border">
-                    <SelectItem value="enrolled">Inscrit</SelectItem>
-                    <SelectItem value="graduated">Diplômé</SelectItem>
-                    <SelectItem value="suspended">Suspendu</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </div>
           </div>
@@ -179,7 +184,7 @@ const StudentForm = () => {
                   id="city"
                   value={formData.city}
                   onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                  placeholder="Ex: Paris"
+                  placeholder="Ex: Dakar"
                   className="mt-1.5"
                 />
               </div>
@@ -191,17 +196,17 @@ const StudentForm = () => {
             <h3 className="text-lg font-semibold text-foreground mb-4">Informations académiques</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="establishment">Établissement *</Label>
+                <Label htmlFor="establishment">Daara *</Label>
                 <Select
                   value={formData.establishmentId}
                   onValueChange={(value) => setFormData({ 
                     ...formData, 
                     establishmentId: value,
-                    tutorId: '' // Reset tutor when establishment changes
+                    tutorId: '' // réinitialiser le tuteur si le daara change
                   })}
                 >
                   <SelectTrigger className="mt-1.5">
-                    <SelectValue placeholder="Sélectionner un établissement" />
+                    <SelectValue placeholder="Sélectionner un daara" />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border border-border">
                     {mockEstablishments.map((est) => (
@@ -223,7 +228,7 @@ const StudentForm = () => {
                     <SelectValue placeholder={
                       formData.establishmentId 
                         ? "Sélectionner un tuteur" 
-                        : "Sélectionnez d'abord un établissement"
+                        : "Sélectionnez d'abord un daara"
                     } />
                   </SelectTrigger>
                   <SelectContent className="bg-popover border border-border">
