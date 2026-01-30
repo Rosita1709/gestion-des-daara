@@ -13,7 +13,8 @@ import {
   Users,
   MapPin,
   Globe,
-  BookOpen
+  BookOpen,
+  UserCircle,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -134,6 +135,12 @@ const Establishments = () => {
                   <MapPin className="w-3.5 h-3.5" />
                   <span>{est.city}, {est.country}</span>
                 </div>
+                {est.responsableName && (
+                  <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
+                    <UserCircle className="w-3.5 h-3.5 text-primary/70" />
+                    <span>Responsable : {est.responsableName}</span>
+                  </div>
+                )}
               </div>
 
               <DropdownMenu>

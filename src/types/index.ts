@@ -8,6 +8,8 @@ export interface Establishment {
   phone: string;
   email: string;
   website?: string;
+  responsableName?: string;
+  responsablePhone?: string;
   studentCount: number;
   tutorCount: number;
   status: 'active' | 'inactive';

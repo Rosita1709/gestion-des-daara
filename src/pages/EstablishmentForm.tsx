@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Layout } from '@/components/layout/Layout';
-import { Building2, Save, MapPin, Mail, Globe } from 'lucide-react';
+import { Building2, Save, MapPin, Mail, Globe, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,6 +32,8 @@ const EstablishmentForm = () => {
     phone: existingEstablishment?.phone || '',
     email: existingEstablishment?.email || '',
     website: existingEstablishment?.website || '',
+    responsableName: existingEstablishment?.responsableName || '',
+    responsablePhone: existingEstablishment?.responsablePhone || '',
     status: existingEstablishment?.status === 'active',
   });
 
@@ -100,6 +102,35 @@ const EstablishmentForm = () => {
                       />
                       <span className="text-sm text-muted-foreground">{formData.status ? 'Actif' : 'Inactif'}</span>
                     </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-7 border-b border-border/40">
+                <h3 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                  <UserCircle className="w-4 h-4 text-primary" />
+                  Responsable d&apos;établissement
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="responsableName">Nom du responsable</Label>
+                    <Input
+                      id="responsableName"
+                      value={formData.responsableName}
+                      onChange={(e) => setFormData({ ...formData, responsableName: e.target.value })}
+                      placeholder="Ex : Serigne Moustapha Diop"
+                      className="mt-1.5 rounded-xl border-border/50"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="responsablePhone">Téléphone du responsable</Label>
+                    <Input
+                      id="responsablePhone"
+                      value={formData.responsablePhone}
+                      onChange={(e) => setFormData({ ...formData, responsablePhone: e.target.value })}
+                      placeholder="+221 77 000 00 00"
+                      className="mt-1.5 rounded-xl border-border/50"
+                    />
                   </div>
                 </div>
               </div>

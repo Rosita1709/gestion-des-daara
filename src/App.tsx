@@ -9,6 +9,8 @@ import Establishments from "./pages/Establishments";
 import EstablishmentForm from "./pages/EstablishmentForm";
 import Tutors from "./pages/Tutors";
 import TutorForm from "./pages/TutorForm";
+import Enseignants from "./pages/Enseignants";
+import EnseignantForm from "./pages/EnseignantForm";
 import Students from "./pages/Students";
 import StudentForm from "./pages/StudentForm";
 import Academic from "./pages/Academic";
@@ -37,6 +39,10 @@ const App = () => (
           <Route path="/tutors/new" element={<TutorForm />} />
           <Route path="/tutors/:id" element={<TutorForm />} />
           <Route path="/tutors/:id/edit" element={<TutorForm />} />
+          <Route path="/enseignants" element={<Enseignants />} />
+          <Route path="/enseignants/new" element={<EnseignantForm />} />
+          <Route path="/enseignants/:id" element={<EnseignantForm />} />
+          <Route path="/enseignants/:id/edit" element={<EnseignantForm />} />
           <Route path="/students" element={<Students />} />
           <Route path="/students/new" element={<StudentForm />} />
           <Route path="/students/:id" element={<StudentForm />} />

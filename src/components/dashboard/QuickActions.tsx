@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom';
-import { Building2, Users, GraduationCap, BookOpen, Plus } from 'lucide-react';
+import { Building2, Users, School, GraduationCap, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const actions = [
   {
     title: 'Nouvel établissement',
-    description: 'Ajouter un établissement',
+    description: 'Ajouter un Daara',
     icon: Building2,
     href: '/establishments/new',
     color: 'bg-primary hover:bg-primary/90',
@@ -18,15 +18,22 @@ const actions = [
     color: 'bg-secondary hover:bg-secondary/90',
   },
   {
+    title: 'Nouvel enseignant',
+    description: 'Ajouter un enseignant',
+    icon: School,
+    href: '/enseignants/new',
+    color: 'bg-success hover:bg-success/90 text-success-foreground',
+  },
+  {
     title: 'Nouvel apprenant',
-    description: 'Inscrire un étudiant',
+    description: 'Inscrire un talibé',
     icon: GraduationCap,
     href: '/students/new',
     color: 'bg-accent hover:bg-accent/90',
   },
   {
     title: 'Nouveau contenu',
-    description: 'Créer cours, TP, examen',
+    description: 'Créer un contenu',
     icon: BookOpen,
     href: '/academic/new',
     color: 'bg-warning hover:bg-warning/90 text-warning-foreground',
